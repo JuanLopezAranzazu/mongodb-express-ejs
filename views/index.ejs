@@ -1,7 +1,14 @@
 <%- include("./partials/header") %>
-<ul>
+<div class="container-users">
   <% users.forEach((user) => { %>
-  <li><%= user.name %> <%= user.lastname %></li>
+  <div class="user-item">
+    <div class="user-data">
+      <p>Fullname: <%= user.name %> <%= user.lastname %></p>
+      <p>Publications: <%= user.publications.length %></p>
+    </div>
+    <p>Username: <%= user.username %></p>
+    <p>Email: <%= user.email %></p>
+  </div>
   <% }) %>
-</ul>
+</div>
 <%- include("./partials/footer") %>

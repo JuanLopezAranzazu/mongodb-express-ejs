@@ -21,49 +21,15 @@ app.use("/public", express.static(path.join(__dirname, "public")));
 app.set("view engine", "ejs");
 app.set("views", path.join(__dirname, "views"));
 
-// initial db
-const User = require("./models/User");
-const Category = require("./models/Category");
-const { hash } = require("argon2");
+// initial setup db
+const {
+  createUsers,
+  createCategories,
+  createRoles,
+  removeUsers,
+} = require("./initialSetup/index");
 
-const createUsers = async (entryUsers) => {
-  try {
-    // Count Documents
-    const count = await User.estimatedDocumentCount();
-
-    // check for existing users
-    if (count > 0) return;
-
-    User.insertMany(entryUsers, (err, result) => {
-      if (err) {
-        throw new Error(err);
-      }
-      console.log(result);
-    });
-  } catch (error) {
-    console.error(error.message);
-  }
-};
-
-const createCategories = async (entryCategories) => {
-  try {
-    // Count Documents
-    const count = await Category.estimatedDocumentCount();
-
-    // check for existing category
-    if (count > 0) return;
-
-    Category.insertMany(entryCategories, (err, result) => {
-      if (err) {
-        throw new Error(err);
-      }
-      console.log(result);
-    });
-  } catch (error) {
-    console.error(error.message);
-  }
-};
-
+createRoles();
 createUsers([
   {
     name: "test",
@@ -71,25 +37,10 @@ createUsers([
     email: "test",
     username: "test",
     password: "test",
+    roles: ["admin", "user"],
   },
 ]);
 createCategories([{ name: "programming" }, { name: "application web" }]);
-
-// remove data db
-const removeUsers = () => {
-  try {
-    User.deleteMany({}, (err) => {
-      if (err) {
-        console.log(err);
-      } else {
-        console.log("Documents removed");
-      }
-    });
-  } catch (error) {
-    console.error(error.message);
-  }
-};
-
 // removeUsers();
 
 // routes
@@ -101,6 +52,8 @@ const publicationRouter = require("./routes/Publication");
 app.use("/publication", publicationRouter);
 const categoryRouter = require("./routes/Category");
 app.use("/category", categoryRouter);
+const roleRouter = require("./routes/Role");
+app.use("/role", roleRouter);
 
 app.use(logErrors);
 app.use(errorHandler);

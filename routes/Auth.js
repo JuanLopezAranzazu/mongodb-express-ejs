@@ -4,17 +4,25 @@ const jwt = require("jsonwebtoken");
 const { hash, verify } = require("argon2");
 // models
 const User = require("./../models/User");
+const Role = require("./../models/Role");
 // middlewares
 const { checkExistingUser } = require("./../middlewares/VerifyUser");
 const { JWT_SECRET } = require("./../config");
 
 router.post("/register", checkExistingUser, async (req, res, next) => {
   try {
-    const { password, ...rest } = req.body;
-
+    const { roles, password, ...rest } = req.body;
     // hash
     const passwordHash = await hash(password);
     const newUser = new User({ ...rest, password: passwordHash });
+
+    if (roles) {
+      const rolesFound = await Role.find({ name: { $in: roles } });
+      newUser.roles = rolesFound.map((role) => role._id);
+    } else {
+      const role = await Role.findOne({ name: "user" });
+      newUser.roles = [role._id];
+    }
     // save user db
     const userSaved = await newUser.save();
     // create token

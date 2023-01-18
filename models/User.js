@@ -8,6 +8,7 @@ const userSchema = new Schema(
     username: { type: String, required: true, unique: true },
     password: { type: String, required: true },
     publications: [{ type: Schema.Types.ObjectId, ref: "Publication" }],
+    roles: [{ type: Schema.Types.ObjectId, ref: "Role" }],
   },
   {
     timestamps: true,
